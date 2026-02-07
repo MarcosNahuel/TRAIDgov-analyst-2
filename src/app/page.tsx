@@ -4,25 +4,45 @@ import { useChat } from "@ai-sdk/react";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { MessageList } from "@/components/ai/message-list";
 import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { ConversationSidebar } from "@/components/chat/conversation-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import type { DashboardSpec, DashboardState } from "@/lib/types";
+import { useConversations } from "@/hooks/useConversations";
+import type { UIMessage } from "ai";
 
 const SUGGESTED_QUESTIONS = [
-  "Cuánto gastó el Ministerio de Salud en 2024?",
-  "Top 10 programas con mayor ejecución presupuestaria",
-  "Qué jurisdicción tiene mayor subejecución?",
-  "Distribución del gasto por finalidad",
-  "Comparame gastos en personal vs transferencias",
-  "Cuánto se destinó a cada provincia?",
+  "Como evoluciono el gasto en educacion de 2019 a 2024?",
+  "Cual fue la ejecucion presupuestaria de Salud el ultimo anio?",
+  "Compare el gasto por finalidad entre 2019 y 2024",
+  "Que jurisdiccion tiene mayor subejecucion en 2024?",
+  "Mostrame la evolucion mensual del gasto total en 2024",
+  "Cuanto representan las transferencias en el presupuesto?",
 ];
 
 export default function HomePage() {
-  const { messages, sendMessage, status } = useChat();
+  const {
+    conversationId,
+    conversations,
+    initialMessages,
+    isLoading: convLoading,
+    startNew,
+    continueConversation,
+    rename,
+    remove,
+    save,
+  } = useConversations();
+
+  const chatId = conversationId ?? "default";
+  const { messages, sendMessage, status } = useChat({
+    id: chatId,
+    messages: (initialMessages as UIMessage[]) ?? undefined,
+  });
 
   const [input, setInput] = useState("");
   const [manualIndex, setManualIndex] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isLoading = status === "streaming" || status === "submitted";
 
@@ -32,7 +52,6 @@ export default function HomePage() {
     for (const message of messages) {
       if (message.role !== "assistant") continue;
 
-      // Rastrear consultas SQL por mensaje
       let sqlCount = 0;
       let lastSql: string | undefined;
 
@@ -46,10 +65,8 @@ export default function HomePage() {
         };
         const toolName = p.type.slice(5);
 
-        // Contar llamadas a executeSQL
         if (toolName === "executeSQL" && p.state === "output-available") {
           sqlCount++;
-          // Extraer el SQL: input.query (el LLM lo genera) o output.sql (executeSQL lo devuelve)
           if (p.input?.query) {
             lastSql = p.input.query as string;
           } else if (p.output?.sql) {
@@ -71,7 +88,7 @@ export default function HomePage() {
     return result;
   }, [messages]);
 
-  // Por defecto: último dashboard. Si hay manualIndex, usarlo.
+  // Por defecto: ultimo dashboard
   const currentDashboardIndex =
     manualIndex !== null && manualIndex < dashboards.length
       ? manualIndex
@@ -83,6 +100,32 @@ export default function HomePage() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Auto-save conversacion
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!conversationId || messages.length === 0) return;
+
+    // Debounce save
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      const lastDash = dashboards[dashboards.length - 1];
+      const insight = lastDash?.spec?.conclusion;
+
+      const currentConv = conversations.find((c) => c.id === conversationId);
+      const isNew =
+        currentConv?.title === "Nueva conversacion" && insight;
+
+      save(messages, {
+        title: isNew ? insight!.slice(0, 80) : undefined,
+        lastInsight: insight || undefined,
+      });
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
+  }, [messages, dashboards, conversationId, conversations, save]);
 
   const navigateDashboard = useCallback(
     (direction: "prev" | "next") => {
@@ -113,13 +156,61 @@ export default function HomePage() {
 
   const hasMessages = messages.length > 0;
 
+  if (convLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
+        <div className="flex items-center gap-2 text-zinc-500">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-violet-500" />
+          <span className="text-sm">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-zinc-950 overflow-hidden">
-      {/* LEFT PANEL — Chat */}
-      <div className="flex w-[380px] flex-col border-r border-zinc-800/50 bg-zinc-900/30">
+      {/* Mobile sidebar toggle */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed left-3 top-4 z-50 rounded-md bg-zinc-800 p-1.5 text-zinc-400 md:hidden"
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+
+      {/* SIDEBAR — Conversations */}
+      <div className={`${sidebarOpen ? "fixed inset-0 z-40 flex" : "hidden"} md:relative md:flex`}>
+        {/* Overlay for mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <div className="relative z-50">
+          <ConversationSidebar
+            conversations={conversations}
+            activeId={conversationId}
+            onSelect={(id) => {
+              continueConversation(id);
+              setSidebarOpen(false);
+            }}
+            onNew={() => {
+              startNew();
+              setSidebarOpen(false);
+            }}
+            onRename={rename}
+            onDelete={remove}
+          />
+        </div>
+      </div>
+
+      {/* CHAT PANEL */}
+      <div className="flex w-full md:w-[380px] flex-col border-r border-zinc-800/50 bg-zinc-900/30">
         {/* Header */}
         <div className="flex h-14 items-center justify-between border-b border-zinc-800/50 px-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pl-8 md:pl-0">
             <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-violet-600 to-pink-600" />
             <span className="text-sm font-semibold text-white">
               TRAID<span className="text-zinc-400">GOV</span>
@@ -158,7 +249,7 @@ export default function HomePage() {
                 <h2 className="mb-1 text-base font-bold text-white">
                   Presupuesto Nacional
                 </h2>
-                <p className="mb-4 text-xs text-zinc-500">Argentina 2024</p>
+                <p className="mb-4 text-xs text-zinc-500">Argentina 2019-2025</p>
                 <div className="space-y-1.5">
                   {SUGGESTED_QUESTIONS.map((question, i) => (
                     <motion.button
@@ -188,7 +279,7 @@ export default function HomePage() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Preguntá sobre el presupuesto..."
+              placeholder="Pregunta sobre el presupuesto..."
               aria-label="Pregunta sobre el presupuesto"
               disabled={isLoading}
               className="flex-1 border-zinc-800 bg-zinc-900/50 text-sm text-white placeholder:text-zinc-600 focus-visible:ring-violet-600"
@@ -222,7 +313,7 @@ export default function HomePage() {
       </div>
 
       {/* RIGHT PANEL — Dashboard */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-zinc-950">
+      <div className="hidden md:flex flex-1 flex-col h-full overflow-hidden bg-zinc-950">
         <DashboardPanel
           dashboards={dashboards}
           currentIndex={currentDashboardIndex}

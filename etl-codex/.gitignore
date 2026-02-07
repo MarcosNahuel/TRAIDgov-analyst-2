@@ -1,0 +1,7 @@
+# ETL local artifacts (do not commit)
+data/
+*.zip
+*.csv
+*.log
+*.tmp
+

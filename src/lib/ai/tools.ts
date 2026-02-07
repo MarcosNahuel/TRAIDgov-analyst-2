@@ -9,17 +9,17 @@ const PREVIEW_LIMIT = 200;
  * Ejecuta queries SELECT de solo lectura contra la base de presupuesto nacional.
  */
 export const executeSQL = tool({
-  description: `Ejecuta una query SQL SELECT contra la base de datos del Presupuesto Nacional Argentino 2024.
-Solo queries SELECT permitidas. Los resultados están en pesos argentinos.
-Usá esta herramienta para obtener datos antes de responder cualquier pregunta sobre presupuesto.`,
+  description: `Ejecuta una query SQL SELECT contra la base de datos del Presupuesto Nacional Argentino (2019-2025, datos mensuales).
+Solo queries SELECT permitidas. Los resultados estan en millones de pesos.
+Usa esta herramienta para obtener datos antes de responder cualquier pregunta.`,
   inputSchema: z.object({
-    query: z.string().describe("Query SQL SELECT válida para PostgreSQL"),
-    explanation: z.string().describe("Qué busca esta query en 1 línea"),
+    query: z.string().describe("Query SQL SELECT valida para PostgreSQL"),
+    explanation: z.string().describe("Que busca esta query en 1 linea"),
   }),
   execute: async ({ query, explanation }) => {
     const normalized = query.trim().replace(/^\s+/g, "").toUpperCase();
     if (!normalized.startsWith("SELECT") && !normalized.startsWith("WITH")) {
-      return { error: "Solo queries SELECT y WITH (CTEs) están permitidas." };
+      return { error: "Solo queries SELECT y WITH (CTEs) estan permitidas." };
     }
 
     if (
@@ -39,7 +39,7 @@ Usá esta herramienta para obtener datos antes de responder cualquier pregunta s
       if (error) {
         return {
           error: error.message,
-          hint: "Revisá nombres de tablas y columnas en el schema. Usá unaccent(LOWER(...)) para filtros de texto.",
+          hint: "Revisa nombres de tablas y columnas en el schema. Usa unaccent(LOWER(...)) para filtros de texto.",
         };
       }
 
@@ -61,47 +61,47 @@ Usá esta herramienta para obtener datos antes de responder cualquier pregunta s
 
 /**
  * Tool 2: generateDashboard
- * Genera un DashboardSpec completo: KPIs, gráficos, tablas y análisis narrativo.
+ * Genera un DashboardSpec completo: KPIs, graficos, tablas y analisis narrativo.
  * NO tiene execute — el frontend renderiza directamente desde los args.
  */
 export const generateDashboard = tool({
-  description: `Genera un dashboard completo con KPIs, gráficos, tablas y análisis narrativo.
-Usá esta herramienta DESPUÉS de executeSQL para presentar los datos de forma visual e insightful.
+  description: `Genera un dashboard completo con KPIs, graficos, tablas y analisis narrativo.
+Usa esta herramienta DESPUES de executeSQL para presentar los datos de forma visual e insightful.
 El dashboard se renderiza en un panel dedicado a la derecha del chat.
 
-Incluí siempre:
-- 2-4 KPIs con las métricas principales
-- 1-3 gráficos apropiados al tipo de datos
+Inclui siempre:
+- 2-4 KPIs con las metricas principales
+- 1-3 graficos apropiados al tipo de datos
 - 1 tabla con los datos detallados (opcional)
-- Análisis narrativo con headline, resumen, insights y alertas
+- Analisis narrativo con headline, resumen, insights y alertas
 
-Tipos de gráfico disponibles:
-- bar: rankings y comparaciones (top N, vs entre categorías)
-- sankey: flujos de dinero (origen → destino)
-- treemap: distribución proporcional (jerarquías de gasto)
-- pie: composición porcentual (partes del total)
-- line: evolución temporal (series mensuales)`,
+Tipos de grafico disponibles:
+- bar: rankings y comparaciones (top N, vs entre categorias)
+- sankey: flujos de dinero (origen -> destino)
+- treemap: distribucion proporcional (jerarquias de gasto)
+- pie: composicion porcentual (partes del total)
+- line: evolucion temporal (series mensuales)`,
   inputSchema: z.object({
-    title: z.string().describe("Título descriptivo del dashboard"),
+    title: z.string().describe("Titulo descriptivo del dashboard"),
     conclusion: z.string().describe("Resumen conciso de 1-2 oraciones que responde la pregunta. Se muestra en el chat."),
     kpis: z.array(z.object({
-      label: z.string().describe("Nombre de la métrica"),
-      value: z.number().describe("Valor numérico"),
+      label: z.string().describe("Nombre de la metrica"),
+      value: z.number().describe("Valor numerico"),
       format: z.enum(["currency", "number", "percent"]).describe("Formato de display"),
-      delta: z.number().optional().describe("Porcentaje de cambio (ej: -15.3 para subejecución)"),
+      delta: z.number().optional().describe("Porcentaje de cambio (ej: -15.3 para subejecucion)"),
       trend: z.enum(["up", "down", "neutral"]).optional(),
-    })).describe("2-4 KPI cards con métricas principales"),
+    })).describe("2-4 KPI cards con metricas principales"),
     charts: z.array(z.object({
       type: z.enum(["bar", "sankey", "treemap", "pie", "line"]),
       title: z.string(),
-      data: z.any().describe("Payload JSON específico para Nivo según el type"),
+      data: z.any().describe("Payload JSON especifico para Nivo segun el type"),
       config: z.object({
         layout: z.enum(["horizontal", "vertical"]).optional(),
         colors: z.array(z.string()).optional(),
         keys: z.array(z.string()).optional(),
         indexBy: z.string().optional(),
       }).optional(),
-    })).describe("1-3 gráficos Nivo"),
+    })).describe("1-3 graficos Nivo"),
     tables: z.array(z.object({
       title: z.string(),
       columns: z.array(z.string()),
@@ -109,10 +109,34 @@ Tipos de gráfico disponibles:
       downloadable: z.boolean(),
     })).optional().describe("0-1 tablas con datos detallados"),
     narrative: z.object({
-      headline: z.string().describe("Conclusión principal en 1 oración"),
+      headline: z.string().describe("Conclusion principal en 1 oracion"),
       summary: z.string().describe("Resumen ejecutivo en 2-3 oraciones"),
-      insights: z.array(z.string()).describe("3-5 insights específicos con datos"),
-      callouts: z.array(z.string()).optional().describe("Alertas sobre subejecución, anomalías, etc."),
-    }).describe("Análisis AI profundo"),
+      insights: z.array(z.string()).describe("3-5 insights especificos con datos"),
+      callouts: z.array(z.string()).optional().describe("Alertas sobre subejecucion, anomalias, etc."),
+    }).describe("Analisis AI profundo"),
   }),
+});
+
+/**
+ * Tool 3: rememberFact
+ * Guarda hechos o preferencias del usuario para futuras conversaciones.
+ */
+export const rememberFact = tool({
+  description: `Guarda un hecho o preferencia del usuario para recordarlo en futuras conversaciones. Usa esta herramienta cuando el usuario exprese:
+- Una preferencia explicita ("siempre quiero ver en pesos constantes")
+- Un contexto relevante ("trabajo en el Ministerio de Salud")
+- Una correccion ("cuando digo educacion me refiero a la funcion, no jurisdiccion")
+No guardes informacion obvia o redundante.`,
+  inputSchema: z.object({
+    content: z.string().describe("Hecho o preferencia a recordar, en 1 oracion"),
+    category: z.enum(["preference", "fact", "correction"]),
+  }),
+  execute: async ({ content, category }) => {
+    const supabase = createServerSupabaseClient();
+    const { error } = await supabase
+      .from("agent_memories")
+      .insert({ content, category });
+    if (error) return { saved: false, error: error.message };
+    return { saved: true, content };
+  },
 });

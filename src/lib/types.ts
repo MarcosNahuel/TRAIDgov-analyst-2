@@ -49,3 +49,18 @@ export interface DashboardState {
   queryCount?: number;
   lastSQL?: string;
 }
+
+// Conversation management
+
+export interface ConversationMeta {
+  id: string;
+  title: string;
+  last_insight: string | null;
+  message_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Conversation extends ConversationMeta {
+  messages: unknown[];
+}

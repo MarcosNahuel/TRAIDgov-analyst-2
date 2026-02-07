@@ -50,19 +50,31 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                 const toolName = part.type.slice(5);
                 const p = part as unknown as { state: string };
 
-                // Completado → no mostrar nada
+                // rememberFact: solo mostrar progreso, no resultado
+                if (toolName === "rememberFact") {
+                  if (p.state === "output-available") return null;
+                  return (
+                    <div
+                      key={partIdx}
+                      className="flex items-center gap-2 py-1 text-xs text-zinc-500"
+                    >
+                      <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                      Guardando en memoria...
+                    </div>
+                  );
+                }
+
+                // Completado -> no mostrar nada
                 if (p.state === "output-available") {
                   return null;
                 }
 
-                // input-available para generateDashboard → no mostrar (no tiene execute)
+                // input-available para generateDashboard -> no mostrar (no tiene execute)
                 if (p.state === "input-available" && toolName === "generateDashboard") {
                   return null;
                 }
 
-                // Estados intermedios → mostrar indicador
-                // input-streaming: LLM generando el input
-                // input-available (executeSQL): query lista, ejecutándose en el server
+                // Estados intermedios -> mostrar indicador
                 const label =
                   toolName === "executeSQL"
                     ? p.state === "input-streaming"
