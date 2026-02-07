@@ -5,7 +5,7 @@ import { getSystemPrompt } from "@/lib/ai/prompts";
 import { loadMemories } from "@/lib/db/memories";
 import { createServerSupabaseClient } from "@/lib/db/supabase";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 interface ToolTiming {
   name: string;
@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       generateDashboard,
       rememberFact,
     },
+    toolChoice: "auto",
     stopWhen: stepCountIs(5),
     onStepFinish: ({ usage, toolCalls }) => {
       stepCount++;
@@ -87,7 +88,7 @@ export async function POST(req: Request) {
         had_error: hadError,
         error_message: errorMessage || null,
         dashboard_generated: dashboardGenerated,
-        model_id: process.env.AI_MODEL || "gemini-3-flash-preview",
+        model_id: process.env.AI_MODEL || (process.env.AI_PROVIDER === "anthropic" ? "claude-sonnet-4-5-20250929" : "gemini-2.5-flash-preview-05-20"),
       };
 
       const supabase = createServerSupabaseClient();
