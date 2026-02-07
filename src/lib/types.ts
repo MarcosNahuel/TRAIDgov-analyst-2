@@ -46,4 +46,6 @@ export interface Narrative {
 export interface DashboardState {
   spec: DashboardSpec;
   timestamp: number;
+  queryCount?: number;
+  lastSQL?: string;
 }

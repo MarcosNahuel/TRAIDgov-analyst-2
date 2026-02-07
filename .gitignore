@@ -47,3 +47,5 @@ qa-screenshots/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

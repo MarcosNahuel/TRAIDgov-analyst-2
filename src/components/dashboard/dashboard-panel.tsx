@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { InsightNavigation } from "./insight-navigation";
+import { ProvenanceBanner } from "./provenance-banner";
 import { KpiCardGrid } from "./kpi-card-grid";
 import { ChartRenderer } from "./chart-renderer";
 import { NarrativePanel } from "./narrative-panel";
@@ -39,7 +40,7 @@ export function DashboardPanel({
 
   if (!current) return null;
 
-  const { spec } = current;
+  const { spec, queryCount, lastSQL } = current;
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -50,6 +51,9 @@ export function DashboardPanel({
         onPrev={() => onNavigate("prev")}
         onNext={() => onNavigate("next")}
       />
+
+      {/* Provenance */}
+      <ProvenanceBanner queryCount={queryCount ?? 0} lastSQL={lastSQL} />
 
       {/* Dashboard content */}
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">

@@ -2,6 +2,8 @@ import { tool } from "ai";
 import { z } from "zod/v3";
 import { createServerSupabaseClient } from "@/lib/db/supabase";
 
+const PREVIEW_LIMIT = 200;
+
 /**
  * Tool 1: executeSQL
  * Ejecuta queries SELECT de solo lectura contra la base de presupuesto nacional.
@@ -46,7 +48,9 @@ Usá esta herramienta para obtener datos antes de responder cualquier pregunta s
       return {
         explanation,
         rowCount: rows.length,
-        data: rows.slice(0, 100),
+        data: rows.slice(0, PREVIEW_LIMIT),
+        sql: query,
+        truncated: rows.length > PREVIEW_LIMIT,
       };
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Error desconocido";

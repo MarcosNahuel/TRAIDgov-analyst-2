@@ -31,14 +31,32 @@ export default function HomePage() {
     const result: DashboardState[] = [];
     for (const message of messages) {
       if (message.role !== "assistant") continue;
+
+      // Rastrear consultas SQL por mensaje
+      let sqlCount = 0;
+      let lastSql: string | undefined;
+
       for (const part of message.parts) {
         if (!part.type.startsWith("tool-")) continue;
         const p = part as unknown as {
           type: string;
           state: string;
           input?: Record<string, unknown>;
+          output?: Record<string, unknown>;
         };
         const toolName = p.type.slice(5);
+
+        // Contar llamadas a executeSQL
+        if (toolName === "executeSQL" && p.state === "output-available") {
+          sqlCount++;
+          // Extraer el SQL: input.query (el LLM lo genera) o output.sql (executeSQL lo devuelve)
+          if (p.input?.query) {
+            lastSql = p.input.query as string;
+          } else if (p.output?.sql) {
+            lastSql = p.output.sql as string;
+          }
+        }
+
         if (toolName !== "generateDashboard") continue;
         if (p.state !== "input-available" && p.state !== "output-available")
           continue;
@@ -46,7 +64,7 @@ export default function HomePage() {
 
         const spec = p.input as unknown as DashboardSpec;
         if (spec.title && spec.kpis) {
-          result.push({ spec, timestamp: 0 });
+          result.push({ spec, timestamp: 0, queryCount: sqlCount, lastSQL: lastSql });
         }
       }
     }

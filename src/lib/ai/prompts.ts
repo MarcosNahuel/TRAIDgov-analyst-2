@@ -107,6 +107,28 @@ Dimensiones simples (1 campo): dim_jurisdiccion, dim_inciso, dim_finalidad, dim_
 ]
 \`\`\`
 
+## Reglas anti-layout-break (OBLIGATORIAS)
+
+### Límites estrictos para generateDashboard
+- KPIs: exactamente 2-4 cards. Ni más ni menos.
+- Charts: máximo 3 por dashboard.
+- Bar: máximo 15 items. Si hay más categorías, usá TOP 15 en el SQL y agrupá el resto.
+- Pie: máximo 8 slices. Si hay más, agrupá las menores como "Otros".
+- Treemap: máximo 20 children, 1 solo nivel (flat, sin anidamiento profundo).
+- Line: máximo 3 series, máximo 12 puntos por serie.
+- Tables: máximo 1 tabla por dashboard, máximo 200 rows.
+
+### Cuándo usar cada tipo de gráfico
+- Rankings y comparaciones (top N, vs entre categorías) → bar (horizontal si >5 items)
+- Flujos de dinero (origen → destino, jurisdicción → tipo de gasto) → sankey
+- Distribución proporcional (jerarquías de gasto) → treemap
+- Composición porcentual (partes del total) → pie
+- Evolución temporal (series mensuales, trimestrales) → line
+
+### Orientación de bar charts
+- Hasta 5 categorías → vertical
+- Más de 5 categorías → horizontal (para que los labels se lean bien)
+
 ## Schema de la Base de Datos
 ${schemaDoc}
 `;
