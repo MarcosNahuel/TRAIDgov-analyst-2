@@ -45,24 +45,40 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                   </div>
                 );
               }
-              // Tool parts: mostrar indicadores compactos
+              // Tool parts: mostrar indicadores de progreso
               if (part.type.startsWith("tool-")) {
                 const toolName = part.type.slice(5);
                 const p = part as unknown as { state: string };
-                if (p.state === "output-available" || p.state === "input-available") {
-                  return null; // No mostrar nada para tools completados
+
+                // Completado → no mostrar nada
+                if (p.state === "output-available") {
+                  return null;
                 }
+
+                // input-available para generateDashboard → no mostrar (no tiene execute)
+                if (p.state === "input-available" && toolName === "generateDashboard") {
+                  return null;
+                }
+
+                // Estados intermedios → mostrar indicador
+                // input-streaming: LLM generando el input
+                // input-available (executeSQL): query lista, ejecutándose en el server
+                const label =
+                  toolName === "executeSQL"
+                    ? p.state === "input-streaming"
+                      ? "Generando consulta SQL..."
+                      : "Consultando datos..."
+                    : toolName === "generateDashboard"
+                      ? "Generando dashboard..."
+                      : "Procesando...";
+
                 return (
                   <div
                     key={partIdx}
                     className="flex items-center gap-2 py-1 text-xs text-zinc-500"
                   >
                     <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-violet-500" />
-                    {toolName === "executeSQL"
-                      ? "Consultando datos..."
-                      : toolName === "generateDashboard"
-                        ? "Generando dashboard..."
-                        : "Procesando..."}
+                    {label}
                   </div>
                 );
               }
