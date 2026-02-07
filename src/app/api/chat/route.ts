@@ -88,7 +88,7 @@ export async function POST(req: Request) {
         had_error: hadError,
         error_message: errorMessage || null,
         dashboard_generated: dashboardGenerated,
-        model_id: process.env.AI_MODEL || (process.env.AI_PROVIDER === "anthropic" ? "claude-sonnet-4-5-20250929" : "gemini-2.5-flash-preview-05-20"),
+        model_id: process.env.AI_MODEL || (process.env.AI_PROVIDER === "anthropic" ? "claude-sonnet-4-5-20250929" : "gemini-2.5-flash"),
       };
 
       const supabase = createServerSupabaseClient();
