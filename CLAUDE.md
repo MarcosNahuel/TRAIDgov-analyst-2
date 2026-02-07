@@ -3,6 +3,15 @@
 > Plataforma de inteligencia financiera pública con IA conversacional.
 > Deploy 100% Vercel (serverless). Sin VPS.
 
+## Browser/Visual QA
+
+Chrome MCP (claude-in-chrome) is unreliable for visual QA. When visual testing is needed:
+1. First verify the MCP connection before planning QA steps
+2. If Chrome connection fails after 2 attempts, fall back to screenshot-based verification via Bash (e.g., `npx playwright screenshot`) or skip visual QA and document what needs manual verification
+3. Never block an entire session on Chrome connectivity
+
+**Pipeline automatizado:** `node scripts/visual-qa.mjs` — Playwright-based, captura screenshots + console errors + genera `qa-report.md`.
+
 ## Quick Context
 
 | Aspecto | Valor |

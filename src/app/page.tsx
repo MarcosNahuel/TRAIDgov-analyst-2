@@ -189,6 +189,7 @@ export default function HomePage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Preguntá sobre el presupuesto..."
+              aria-label="Pregunta sobre el presupuesto"
               disabled={isLoading}
               className="flex-1 border-zinc-800 bg-zinc-900/50 text-sm text-white placeholder:text-zinc-600 focus-visible:ring-violet-600"
             />
@@ -196,6 +197,7 @@ export default function HomePage() {
               type="submit"
               disabled={isLoading || !input.trim()}
               size="sm"
+              aria-label="Enviar mensaje"
               className="bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700"
             >
               <svg
