@@ -1,6 +1,8 @@
 "use client";
 
+import { memo } from "react";
 import { ResponsiveBar, type BarDatum } from "@nivo/bar";
+import { formatBudgetAmount } from "@/lib/chart-utils";
 
 interface BudgetBarProps {
   data: Record<string, unknown>[];
@@ -10,7 +12,7 @@ interface BudgetBarProps {
   indexBy?: string;
 }
 
-export function BudgetBar({
+function BudgetBarInner({
   data,
   title,
   layout = "horizontal",
@@ -20,12 +22,11 @@ export function BudgetBar({
   if (!data?.length) {
     return (
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-sm text-zinc-400">Sin datos para el gráfico de barras</p>
+        <p className="text-sm text-zinc-400">Sin datos para el grafico de barras</p>
       </div>
     );
   }
 
-  // Auto-detectar keys si no se proporcionan
   const firstRow = data[0];
   const detectedIndexBy =
     indexBy ||
@@ -60,6 +61,7 @@ export function BudgetBar({
           colors={{ scheme: "purple_orange" }}
           borderRadius={3}
           borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}
+          animate={false}
           axisBottom={
             layout === "vertical"
               ? {
@@ -67,11 +69,18 @@ export function BudgetBar({
                   tickPadding: 8,
                   tickRotation: -45,
                 }
-              : { tickSize: 0, tickPadding: 8 }
+              : {
+                  tickSize: 0,
+                  tickPadding: 8,
+                  format: (v) => formatBudgetAmount(Number(v)),
+                }
           }
           axisLeft={{
             tickSize: 0,
             tickPadding: 8,
+            ...(layout === "horizontal"
+              ? {}
+              : { format: (v) => formatBudgetAmount(Number(v)) }),
           }}
           enableGridY={layout === "vertical"}
           enableGridX={layout === "horizontal"}
@@ -97,3 +106,6 @@ export function BudgetBar({
     </div>
   );
 }
+
+export const BudgetBar = memo(BudgetBarInner);
+export default BudgetBar;

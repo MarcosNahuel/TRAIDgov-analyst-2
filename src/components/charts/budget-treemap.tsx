@@ -1,6 +1,8 @@
 "use client";
 
+import { memo } from "react";
 import { ResponsiveTreeMap } from "@nivo/treemap";
+import { formatBudgetAmount } from "@/lib/chart-utils";
 
 interface TreemapData {
   name: string;
@@ -13,7 +15,7 @@ interface BudgetTreemapProps {
   title: string;
 }
 
-export function BudgetTreemap({ data, title }: BudgetTreemapProps) {
+function BudgetTreemapInner({ data, title }: BudgetTreemapProps) {
   if (!data?.children?.length && !data?.value) {
     return (
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
@@ -32,7 +34,7 @@ export function BudgetTreemap({ data, title }: BudgetTreemapProps) {
           value="value"
           margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
           labelSkipSize={32}
-          label={(node) => `${node.id} (${((node.value / 1_000_000) | 0).toLocaleString("es-AR")}M)`}
+          label={(node) => `${node.id} (${formatBudgetAmount(node.value)})`}
           labelTextColor={{ from: "color", modifiers: [["darker", 2.5]] }}
           parentLabelPosition="left"
           parentLabelTextColor={{ from: "color", modifiers: [["darker", 3]] }}
@@ -40,6 +42,7 @@ export function BudgetTreemap({ data, title }: BudgetTreemapProps) {
           borderColor={{ from: "color", modifiers: [["darker", 0.3]] }}
           borderWidth={1}
           nodeOpacity={1}
+          animate={false}
           theme={{
             text: { fontSize: 11 },
             tooltip: {
@@ -57,3 +60,6 @@ export function BudgetTreemap({ data, title }: BudgetTreemapProps) {
     </div>
   );
 }
+
+export const BudgetTreemap = memo(BudgetTreemapInner);
+export default BudgetTreemap;

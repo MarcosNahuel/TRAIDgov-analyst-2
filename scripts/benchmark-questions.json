@@ -1,0 +1,12 @@
+[
+  {"id": "simple-1", "q": "Cuanto se gasto en total en 2024?", "type": "simple"},
+  {"id": "simple-2", "q": "Top 5 jurisdicciones por devengado en 2024", "type": "simple"},
+  {"id": "simple-3", "q": "Que porcentaje ejecuto Salud en 2024?", "type": "simple"},
+  {"id": "simple-4", "q": "Gasto mensual de Capital Humano en 2024", "type": "simple"},
+  {"id": "simple-5", "q": "Distribucion por fuente de financiamiento 2024", "type": "simple"},
+  {"id": "complex-1", "q": "Compare educacion vs salud de 2019 a 2024", "type": "complex"},
+  {"id": "complex-2", "q": "Que jurisdiccion tiene mayor subejecucion en 2024?", "type": "complex"},
+  {"id": "complex-3", "q": "Como evoluciono el gasto en defensa entre Macri y Milei?", "type": "complex"},
+  {"id": "complex-4", "q": "Cuanto representan las transferencias sobre el total por anio?", "type": "complex"},
+  {"id": "complex-5", "q": "Mostrame la serie mensual de 2024 deflactada por IPC", "type": "complex"}
+]

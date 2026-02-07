@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
 interface PieData {
@@ -13,11 +14,11 @@ interface BudgetPieProps {
   title: string;
 }
 
-export function BudgetPie({ data, title }: BudgetPieProps) {
+function BudgetPieInner({ data, title }: BudgetPieProps) {
   if (!data?.length) {
     return (
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-sm text-zinc-400">Sin datos para el gráfico de torta</p>
+        <p className="text-sm text-zinc-400">Sin datos para el grafico de torta</p>
       </div>
     );
   }
@@ -42,6 +43,7 @@ export function BudgetPie({ data, title }: BudgetPieProps) {
           arcLinkLabelsColor={{ from: "color" }}
           arcLabelsSkipAngle={10}
           arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
+          animate={false}
           legends={[
             {
               anchor: "right",
@@ -75,3 +77,6 @@ export function BudgetPie({ data, title }: BudgetPieProps) {
     </div>
   );
 }
+
+export const BudgetPie = memo(BudgetPieInner);
+export default BudgetPie;

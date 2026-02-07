@@ -4,6 +4,66 @@ import { createServerSupabaseClient } from "@/lib/db/supabase";
 
 const PREVIEW_LIMIT = 200;
 
+// Regex de comandos no permitidos
+const FORBIDDEN_SQL = /\b(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b/i;
+
+function validateSQL(query: string): string | null {
+  const normalized = query.trim().replace(/^\s+/g, "").toUpperCase();
+  if (!normalized.startsWith("SELECT") && !normalized.startsWith("WITH")) {
+    return "Solo queries SELECT y WITH (CTEs) estan permitidas.";
+  }
+  if (FORBIDDEN_SQL.test(query)) {
+    return "Query contiene comandos no permitidos.";
+  }
+  return null;
+}
+
+/**
+ * Genera warnings de sanity check sobre los resultados de una query.
+ */
+function generateWarnings(rows: Record<string, unknown>[]): string[] {
+  const warnings: string[] = [];
+
+  if (rows.length === 0) {
+    warnings.push(
+      "La query no devolvio resultados. Posibles causas: " +
+      "filtro de periodo incorrecto, nombre de dimension mal escrito, " +
+      "o datos no cargados para ese anio."
+    );
+    return warnings;
+  }
+
+  if (rows.length >= PREVIEW_LIMIT) {
+    warnings.push(
+      `Resultados truncados a ${PREVIEW_LIMIT} filas. ` +
+      "Usa agregacion (SUM/GROUP BY) para datos mas concisos."
+    );
+  }
+
+  // Chequeo de magnitudes en columnas numericas
+  const numericCols = Object.keys(rows[0] ?? {}).filter(
+    k => typeof rows[0][k] === "number"
+  );
+  for (const col of numericCols) {
+    const vals = rows.map(r => r[col] as number).filter(v => v != null);
+    if (vals.some(v => v < 0)) {
+      warnings.push(
+        `Columna "${col}" tiene valores negativos. ` +
+        "En presupuesto esto puede indicar reducciones o ajustes."
+      );
+    }
+    const max = Math.max(...vals.map(Math.abs));
+    if (max > 1e15) {
+      warnings.push(
+        `Columna "${col}" tiene valores muy grandes (${max}). ` +
+        "Verificar si la query necesita /1000000 para expresar en millones."
+      );
+    }
+  }
+
+  return warnings;
+}
+
 /**
  * Tool 1: executeSQL
  * Ejecuta queries SELECT de solo lectura contra la base de presupuesto nacional.
@@ -11,39 +71,34 @@ const PREVIEW_LIMIT = 200;
 export const executeSQL = tool({
   description: `Ejecuta una query SQL SELECT contra la base de datos del Presupuesto Nacional Argentino (2019-2025, datos mensuales).
 Solo queries SELECT permitidas. Los resultados estan en millones de pesos.
-Usa esta herramienta para obtener datos antes de responder cualquier pregunta.`,
+Usa esta herramienta para obtener datos antes de responder cualquier pregunta.
+Para preguntas que requieren 2+ queries distintas (comparaciones, cruces), usa planQueries en su lugar.`,
   inputSchema: z.object({
     query: z.string().describe("Query SQL SELECT valida para PostgreSQL"),
     explanation: z.string().describe("Que busca esta query en 1 linea"),
   }),
   execute: async ({ query, explanation }) => {
-    const normalized = query.trim().replace(/^\s+/g, "").toUpperCase();
-    if (!normalized.startsWith("SELECT") && !normalized.startsWith("WITH")) {
-      return { error: "Solo queries SELECT y WITH (CTEs) estan permitidas." };
-    }
-
-    if (
-      /\b(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b/i.test(
-        query
-      )
-    ) {
-      return { error: "Query contiene comandos no permitidos." };
-    }
+    const error = validateSQL(query);
+    if (error) return { error };
 
     try {
       const supabase = createServerSupabaseClient();
-      const { data, error } = await supabase.rpc("execute_readonly_query", {
+      const t0 = performance.now();
+      const { data, error: dbError } = await supabase.rpc("execute_readonly_query", {
         sql_query: query,
       });
+      const latencyMs = Math.round(performance.now() - t0);
 
-      if (error) {
+      if (dbError) {
         return {
-          error: error.message,
+          error: dbError.message,
           hint: "Revisa nombres de tablas y columnas en el schema. Usa unaccent(LOWER(...)) para filtros de texto.",
+          latency_ms: latencyMs,
         };
       }
 
       const rows = Array.isArray(data) ? data : data ? [data] : [];
+      const warnings = generateWarnings(rows as Record<string, unknown>[]);
 
       return {
         explanation,
@@ -51,6 +106,8 @@ Usa esta herramienta para obtener datos antes de responder cualquier pregunta.`,
         data: rows.slice(0, PREVIEW_LIMIT),
         sql: query,
         truncated: rows.length > PREVIEW_LIMIT,
+        warnings,
+        latency_ms: latencyMs,
       };
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Error desconocido";
@@ -60,13 +117,75 @@ Usa esta herramienta para obtener datos antes de responder cualquier pregunta.`,
 });
 
 /**
- * Tool 2: generateDashboard
+ * Tool 2: planQueries
+ * Ejecuta multiples queries SQL en paralelo para preguntas complejas.
+ */
+export const planQueries = tool({
+  description: `Planifica y ejecuta multiples queries SQL en paralelo.
+Usa esta tool cuando necesites datos de 2 o mas consultas distintas para responder
+(ej: comparar anios, cruzar dimensiones, obtener datos de multiples fuentes).
+Es mas preciso y eficiente que llamar executeSQL multiples veces.
+Cada query debe ser SELECT valida y tener un label descriptivo.`,
+  inputSchema: z.object({
+    queries: z.array(z.object({
+      query: z.string().describe("Query SQL SELECT valida"),
+      label: z.string().describe("Nombre descriptivo del resultado"),
+    })).min(2).max(5),
+  }),
+  execute: async ({ queries }) => {
+    // Validar todas las queries primero
+    for (const q of queries) {
+      const err = validateSQL(q.query);
+      if (err) {
+        return { error: `Query "${q.label}": ${err}` };
+      }
+    }
+
+    const supabase = createServerSupabaseClient();
+
+    // Ejecutar en paralelo
+    const results = await Promise.all(
+      queries.map(async (q) => {
+        const start = performance.now();
+        try {
+          const { data, error } = await supabase.rpc("execute_readonly_query", {
+            sql_query: q.query,
+          });
+          const rows = Array.isArray(data) ? data : data ? [data] : [];
+          const warnings = generateWarnings(rows as Record<string, unknown>[]);
+          return {
+            label: q.label,
+            rowCount: rows.length,
+            data: rows.slice(0, PREVIEW_LIMIT),
+            latency_ms: Math.round(performance.now() - start),
+            error: error?.message ?? null,
+            warnings,
+          };
+        } catch (e: unknown) {
+          return {
+            label: q.label,
+            rowCount: 0,
+            data: [],
+            latency_ms: Math.round(performance.now() - start),
+            error: e instanceof Error ? e.message : "Error desconocido",
+            warnings: [],
+          };
+        }
+      })
+    );
+
+    return { results };
+  },
+});
+
+/**
+ * Tool 3: generateDashboard
  * Genera un DashboardSpec completo: KPIs, graficos, tablas y analisis narrativo.
  * NO tiene execute — el frontend renderiza directamente desde los args.
  */
 export const generateDashboard = tool({
   description: `Genera un dashboard completo con KPIs, graficos, tablas y analisis narrativo.
-Usa esta herramienta DESPUES de executeSQL para presentar los datos de forma visual e insightful.
+Usa esta herramienta DESPUES de executeSQL o planQueries para presentar los datos de forma visual e insightful.
 El dashboard se renderiza en un panel dedicado a la derecha del chat.
 
 Inclui siempre:
@@ -118,7 +237,7 @@ Tipos de grafico disponibles:
 });
 
 /**
- * Tool 3: rememberFact
+ * Tool 4: rememberFact
  * Guarda hechos o preferencias del usuario para futuras conversaciones.
  */
 export const rememberFact = tool({

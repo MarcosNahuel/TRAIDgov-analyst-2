@@ -80,9 +80,13 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                     ? p.state === "input-streaming"
                       ? "Generando consulta SQL..."
                       : "Consultando datos..."
-                    : toolName === "generateDashboard"
-                      ? "Generando dashboard..."
-                      : "Procesando...";
+                    : toolName === "planQueries"
+                      ? p.state === "input-streaming"
+                        ? "Planificando consultas..."
+                        : "Ejecutando consultas en paralelo..."
+                      : toolName === "generateDashboard"
+                        ? "Generando dashboard..."
+                        : "Procesando...";
 
                 return (
                   <div

@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ResponsiveSankey } from "@nivo/sankey";
 
 interface SankeyNode {
@@ -18,17 +19,15 @@ interface BudgetSankeyProps {
   title: string;
 }
 
-export function BudgetSankey({ data, title }: BudgetSankeyProps) {
-  // Validación defensiva
+function BudgetSankeyInner({ data, title }: BudgetSankeyProps) {
   if (!data?.nodes?.length || !data?.links?.length) {
     return (
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-sm text-zinc-400">Sin datos para el gráfico Sankey</p>
+        <p className="text-sm text-zinc-400">Sin datos para el grafico Sankey</p>
       </div>
     );
   }
 
-  // Filtrar ciclos (source !== target) y links con value <= 0
   const nodeIds = new Set(data.nodes.map((n) => n.id));
   const safeLinks = data.links.filter(
     (link) =>
@@ -41,7 +40,7 @@ export function BudgetSankey({ data, title }: BudgetSankeyProps) {
   if (safeLinks.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-sm text-zinc-400">Sin flujos válidos para visualizar</p>
+        <p className="text-sm text-zinc-400">Sin flujos validos para visualizar</p>
       </div>
     );
   }
@@ -67,6 +66,7 @@ export function BudgetSankey({ data, title }: BudgetSankeyProps) {
           linkHoverOpacity={0.8}
           linkHoverOthersOpacity={0.1}
           enableLinkGradient
+          animate={false}
           labelPosition="outside"
           labelOrientation="horizontal"
           labelPadding={12}
@@ -88,3 +88,6 @@ export function BudgetSankey({ data, title }: BudgetSankeyProps) {
     </div>
   );
 }
+
+export const BudgetSankey = memo(BudgetSankeyInner);
+export default BudgetSankey;

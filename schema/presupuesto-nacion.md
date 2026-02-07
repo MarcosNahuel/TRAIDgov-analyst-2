@@ -36,9 +36,6 @@
 | `fuente_financiamiento_id` | TEXT | FK a `dim_fuente_financiamiento` |
 | `credito_devengado` | NUMERIC | Devengado del mes (millones) |
 | `credito_vigente` | NUMERIC | Vigente del mes (millones) |
-| `source_file` | TEXT | Ej: `credito-mensual-2024` |
-| `loaded_at` | TIMESTAMPTZ | Timestamp de carga |
-| `row_hash` | TEXT | Hash deterministico del grano (idempotencia) |
 
 ### Escala de Montos
 
@@ -322,6 +319,17 @@ JOIN dim_fuente_financiamiento ff ON ff.fuente_financiamiento_id = h.fuente_fina
 WHERE h.ejercicio_presupuestario = 2024
 GROUP BY 1 ORDER BY 2 DESC;
 ```
+
+---
+
+## Vistas Rapidas (pre-agregadas, usar siempre que sea posible)
+
+- `mv_gasto_anual_jurisdiccion`: devengado + vigente por anio y jurisdiccion. Columnas: ejercicio_presupuestario, jurisdiccion_id, jurisdiccion_desc, devengado, vigente.
+- `mv_serie_mensual`: devengado + vigente mensual agregado. Columnas: ejercicio_presupuestario, impacto_presupuestario_mes, periodo, devengado, vigente.
+- `mv_gasto_finalidad_funcion`: devengado + vigente por finalidad/funcion y anio. Columnas: ejercicio_presupuestario, finalidad_id, finalidad_desc, funcion_id, funcion_desc, devengado, vigente.
+
+Estas vistas son mucho mas rapidas que consultar fact_credito_devengado_mensual directamente.
+Usar para: totales por anio, rankings de jurisdicciones, series temporales, analisis funcional.
 
 ---
 

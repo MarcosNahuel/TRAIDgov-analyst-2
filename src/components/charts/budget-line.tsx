@@ -1,6 +1,8 @@
 "use client";
 
+import { memo } from "react";
 import { ResponsiveLine } from "@nivo/line";
+import { formatBudgetAmount } from "@/lib/chart-utils";
 
 interface LineSeriesPoint {
   x: string | number;
@@ -17,11 +19,11 @@ interface BudgetLineProps {
   title: string;
 }
 
-export function BudgetLine({ data, title }: BudgetLineProps) {
+function BudgetLineInner({ data, title }: BudgetLineProps) {
   if (!data?.length || !data[0]?.data?.length) {
     return (
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-sm text-zinc-400">Sin datos para el gráfico de líneas</p>
+        <p className="text-sm text-zinc-400">Sin datos para el grafico de lineas</p>
       </div>
     );
   }
@@ -32,10 +34,11 @@ export function BudgetLine({ data, title }: BudgetLineProps) {
       <div className="h-[420px]">
         <ResponsiveLine
           data={data}
-          margin={{ top: 20, right: 110, bottom: 50, left: 60 }}
+          margin={{ top: 20, right: 110, bottom: 50, left: 80 }}
           xScale={{ type: "point" }}
           yScale={{ type: "linear", min: "auto", max: "auto", stacked: false }}
           curve="monotoneX"
+          animate={false}
           axisBottom={{
             tickSize: 0,
             tickPadding: 8,
@@ -44,6 +47,7 @@ export function BudgetLine({ data, title }: BudgetLineProps) {
           axisLeft={{
             tickSize: 0,
             tickPadding: 8,
+            format: (v) => formatBudgetAmount(Number(v)),
           }}
           enableGridX={false}
           colors={{ scheme: "purple_orange" }}
@@ -92,3 +96,6 @@ export function BudgetLine({ data, title }: BudgetLineProps) {
     </div>
   );
 }
+
+export const BudgetLine = memo(BudgetLineInner);
+export default BudgetLine;
