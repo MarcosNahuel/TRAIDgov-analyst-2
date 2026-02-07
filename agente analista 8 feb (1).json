@@ -1,0 +1,910 @@
+{
+  "name": "agente analista 8 feb",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37512e1a-8376-4ba0-bdcd-34bb9329ae4b",
+              "name": "response",
+              "type": "string",
+              "value": "=\"https://quickchart.io/chart?width=400&c=\" + encodeURIComponent(JSON.stringify($json.output))\n\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "718a8e18-5e82-4ecf-80ae-006ae8851dde",
+      "name": "Set response",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2368,
+        64
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"name\": \"chart_configuration\",\n    \"description\": \"Configuration schema for Chart.js charts\",\n    \"strict\": true,\n    \"schema\": {\n  \"type\": \"object\",\n  \"properties\": {\n    \"type\": {\n      \"type\": \"string\",\n      \"enum\": [\"bar\", \"line\", \"radar\", \"pie\", \"doughnut\", \"polarArea\", \"bubble\", \"scatter\", \"area\"]\n    },\n    \"data\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"labels\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          }\n        },\n        \"datasets\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"label\": {\n                \"type\": [\"string\", \"null\"]\n              },\n              \"data\": {\n                \"type\": \"array\",\n                \"items\": {\n                  \"type\": \"number\"\n                }\n              },\n              \"backgroundColor\": {\n                \"type\": [\"array\", \"null\"],\n                \"items\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"borderColor\": {\n                \"type\": [\"array\", \"null\"],\n                \"items\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"borderWidth\": {\n                \"type\": [\"number\", \"null\"]\n              }\n            },\n            \"required\": [\"data\", \"label\", \"backgroundColor\", \"borderColor\", \"borderWidth\"],\n            \"additionalProperties\": false\n          }\n        }\n      },\n      \"required\": [\"labels\", \"datasets\"],\n      \"additionalProperties\": false\n    },\n    \"options\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"scales\": {\n          \"type\": [\"object\", \"null\"],\n          \"properties\": {\n            \"yAxes\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": [\"object\", \"null\"],\n                \"properties\": {\n                  \"ticks\": {\n                    \"type\": [\"object\", \"null\"],\n                    \"properties\": {\n                      \"max\": {\n                        \"type\": [\"number\", \"null\"]\n                      },\n                      \"min\": {\n                        \"type\": [\"number\", \"null\"]\n                      },\n                      \"stepSize\": {\n                        \"type\": [\"number\", \"null\"]\n                      },\n                      \"beginAtZero\": {\n                        \"type\": [\"boolean\", \"null\"]\n                      }\n                    },\n                    \"required\": [\"max\", \"min\", \"stepSize\", \"beginAtZero\"],\n                    \"additionalProperties\": false\n                  },\n                  \"stacked\": {\n                    \"type\": [\"boolean\", \"null\"]\n                  }\n                },\n                \"required\": [\"ticks\", \"stacked\"],\n                \"additionalProperties\": false\n              }},\n              \"xAxes\": {\n                \"type\": [\"object\", \"null\"],\n                \"properties\": {\n                  \"stacked\": {\n                    \"type\": [\"boolean\", \"null\"]\n                  }\n                },\n                \"required\": [\"stacked\"],\n                \"additionalProperties\": false\n              }\n          },\n          \"required\": [\"yAxes\", \"xAxes\"],\n          \"additionalProperties\": false\n        },\n        \"plugins\": {\n          \"type\": [\"object\", \"null\"],\n          \"properties\": {\n            \"title\": {\n              \"type\": [\"object\", \"null\"],\n              \"properties\": {\n                \"display\": {\n                  \"type\": [\"boolean\", \"null\"]\n                },\n                \"text\": {\n                  \"type\": [\"string\", \"null\"]\n                }\n              },\n              \"required\": [\"display\", \"text\"],\n              \"additionalProperties\": false\n            },\n            \"legend\": {\n              \"type\": [\"object\", \"null\"],\n              \"properties\": {\n                \"display\": {\n                  \"type\": [\"boolean\", \"null\"]\n                },\n                \"position\": {\n                  \"type\": [\"string\", \"null\"],\n                  \"enum\": [\"top\", \"left\", \"bottom\", \"right\", null]\n                }\n              },\n              \"required\": [\"display\", \"position\"],\n              \"additionalProperties\": false\n            }\n          },\n          \"required\": [\"title\", \"legend\"],\n          \"additionalProperties\": false\n        }\n      },\n      \"required\": [\"scales\", \"plugins\"],\n      \"additionalProperties\": false\n    }\n  },\n  \"required\": [\"type\", \"data\", \"options\"],\n  \"additionalProperties\": false\n}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2208,
+        272
+      ],
+      "id": "60cd164a-f871-45b8-ac6b-0d488564ddd5",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "content": "## Data Retriever and Visualization Agent as Tool\n",
+        "height": 1200,
+        "width": 1660,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "1988bdc0-80be-4b59-805e-9637bbdc5b78",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "name": "generate_a_chart",
+        "description": "Call this tool whenever you need to generate a chart. All string values must be properly escaped, especially for multi-line strings.  When processing the output of the tool, URLs returned should always be in markdown format. for example,![](url)",
+        "workflowId": "={{ $workflow.id }}",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n\"type\": \"object\",\n\"properties\": {\n\t\"query\": {\n\t\t\"type\": \"string\",\n\t\t\"description\": \"a query describing the chart to generate in json format\"\n\t\t},\n    \"event\": {\n         \"type\": \"string\",\n          \"description\": \"the type of event.  this should always be set to Generate\"\n\t}\n}\n}"
+      },
+      "id": "fde6b585-bd5d-4c5f-8d72-29dcea7ac6eb",
+      "name": "Generate chart",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        1008,
+        272
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37512e1a-8376-4ba0-bdcd-34bb9329ae4b",
+              "name": "response",
+              "type": "string",
+              "value": "=\n{{ $json.output }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb81e246-23e5-4be4-9ab6-38758dac0a26",
+      "name": "Set response1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2272,
+        448
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "name": "retrieve_data",
+        "description": "Call this tool whenever you need to retrieve data. All string values must be properly escaped, especially for multi-line strings.  Don't pass in the SQL query.  Just the question the user asked.",
+        "workflowId": "={{ $workflow.id }}",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n\"type\": \"object\",\n\"properties\": {\n\t\"query\": {\n\t\t\"type\": \"string\",\n\t\t\"description\": \"the users query\"\n\t\t},\n    \"event\": {\n         \"type\": \"string\",\n          \"description\": \"the type of event.  this should always be set to Data\"\n\t}\n}\n}"
+      },
+      "id": "ee615fd4-2ed6-407a-9a8a-5b110c944c7c",
+      "name": "Retrieve Data",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        1120,
+        272
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.query }}",
+        "options": {
+          "systemMessage": "=You are a helpful Data Visualization Orchestrator Agent working with three tools and a Pinecone Vector Store named **Presupuesto_2025**. This vector store holds metadata about the “presupuesto 2025” table, including column names and possible values. Always begin by querying this vector store to find any relevant columns or dimension names that match the user’s query. If you do not find them or if the user is unsure, call **dimension_extraction** to discover the correct column(s) or values.\n\n---\n\n## Tools\n\n1. **dimension_extraction**  \n   Use this tool if the user wants to see possible columns or values from the “presupuesto 2025” table or if the user is unsure which dimension or value to filter on.  \n   The table’s dimensions are hierarchical:  \n   - **Institucional**: caracter → jurisdiccion → unidad organizativa  \n   - **Económica**: CLASI ECONOMICA 1 → CLASIFICACION ECONOMICA_2 → CLASIFICACION ECONOMICA_3 → CLASIFICACION ECONOMICA_4\n\n2. **retrieve_data**  \n   Use this tool if the user needs to fetch or sum data from the “presupuesto 2025” table.  \n   Provide the user’s question (not raw SQL) as the input. The tool will handle generating the final SQL.\n\n3. **generate_a_chart**  \n   Use this tool if the user explicitly wants a chart (bar, line, pie, etc.).  \n   Provide a valid Chart.js configuration in JSON format as the input. The tool will return a chart URL, which you must display in Markdown format (e.g., `![](URL)`).\n\n---\n\n## Overall Guidelines\n\n1. **First**: Search the Pinecone Vector Store (Presupuesto_2025) for any column names or values related to the user’s query.\n   - If you cannot find them, or the user is uncertain, call **dimension_extraction**.\n\n2. **Second**: Once you have the exact columns or filters, call **retrieve_data** to get the numerical results.\n\n3. **Third**: If the user wants a visualization, call **generate_a_chart** and display the chart in Markdown format.\n\n---\n\n## Important Notes\n\n- Provide clarifications or ask additional questions if the user’s request is ambiguous.  \n- Only use the chart tool if the user explicitly requests a chart.  \n- Return the final answer or chart as requested.\n\n---\n\n## Your Goal\n\n1. Identify whether the user needs dimension info, raw data retrieval, or a chart.  \n2. Call the appropriate tool(s) in the correct order (first check the vector store, then dimension_extraction if needed, then retrieve_data, then generate_a_chart).  \n3. Provide the final answer or chart as requested.\n\n#speak in spanish\n# formato de numeros \"millones\" y debes aclarar ue los numeros estan en millones\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        784,
+        32
+      ],
+      "id": "4b7f365e-86d5-4eb8-9278-9ef80d3861de",
+      "name": "Orchestrator Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un experto en visualización de datos con Chart.js, especializado en el análisis y la presentación gráfica del Presupuesto 2025 de Mendoza. Tu objetivo principal es generar objetos de configuración para Chart.js que sean válidos, bien estructurados y claramente etiquetados, de acuerdo con las solicitudes de visualización que recibas en el contexto del presupuesto provincial. Las configuraciones que produzcas deberán ser directamente utilizables en cualquier entorno que emplee Chart.js, sin necesidad de modificaciones adicionales.\n\nEntrada:\nRecibirás solicitudes en lenguaje natural que describan la visualización deseada aplicada a los datos del Presupuesto 2025 de Mendoza. Dichas solicitudes podrán incluir:\n\nTipo de Gráfico:\nPor ejemplo, gráficos de barras, líneas, pastel, radar, etc., que permitan comparar variables como ingresos, gastos (corrientes y de capital), asignaciones a obras públicas, déficit proyectado, entre otros.\n\nDatos:\nSe trabajará con datos presupuestarios, que pueden estar disponibles en formatos variados (CSV, JSON, listas, etc.). Si el formato o la estructura de los datos no es claro, solicita las aclaraciones pertinentes para extraer y transformar la información necesaria para el análisis del presupuesto.\n\nEtiquetas:\nIncluye etiquetas para los puntos de datos, ejes y otros elementos relevantes. Es fundamental que los usuarios proporcionen títulos claros para los ejes (por ejemplo, “Rubro” en el eje X y “Monto (en billones)” en el eje Y) y que se indiquen las unidades de medida, si aplica. Si alguna información de etiquetado o unidad resulta ambigua o falta, pregunta para obtener mayores detalles.\n\nEstilización:\nLos usuarios pueden incluir opciones de personalización como colores, tipografías, cuadrículas, títulos, leyendas, tooltips y escalas de ejes. Emplea los valores predeterminados de Chart.js si no se indican ajustes específicos.\n\nOpciones Específicas de Chart.js:\nEs posible que se soliciten características particulares (por ejemplo, escalas logarítmicas, animaciones, plugins, etc.). Incorpora estos elementos en la configuración si se indican en la solicitud.\n\nInterpretación de Descripciones Naturales:\nConvierte descripciones en lenguaje natural, aunque sean poco estructuradas, en configuraciones precisas y completas para Chart.js, adecuadas para resaltar la distribución presupuestaria, tendencias y comparaciones del Presupuesto 2025.\n\nInformación de Ejes:\nAsegúrate de obtener detalles claros para la configuración de los ejes, incluyendo:\n\nTítulos de Ejes: Por ejemplo, “Categoría Presupuestaria” para el eje X y “Monto (en billones o millones)” para el eje Y.\nUnidades de Medida: Especifica las unidades pertinentes según el contexto (por ejemplo, “(USD)”, “(millones)” o “(billones)”).\nTipo de Datos: Indica si los datos son categóricos, numéricos o de series temporales.\nFormato Específico: Considera requisitos de formateo para fechas, números, símbolos monetarios, etc.\nSalida:\nGenera un objeto JSON bien formateado y fácilmente legible que represente la configuración completa para Chart.js, listo para ser utilizado en el constructor new Chart(). La salida debe incluir, en particular, la configuración adecuada de los ejes (incluyendo títulos y unidades) dentro de la sección options.scales.\n\nEjemplo de Entrada (Adaptado al Presupuesto 2025):\n\n\"Genera un gráfico de barras que compare, para el Presupuesto 2025 de Mendoza, los ingresos totales frente a los gastos corrientes y de capital, segmentados por categoría. Por ejemplo, muestra los montos presupuestados para Educación, Salud, Seguridad y Obras Públicas. Utiliza distintos colores para cada categoría y coloca el título 'Análisis Presupuestario 2025 - Mendoza'. El eje X representará las categorías presupuestarias y el eje Y el monto en billones de pesos.\"\n\nEjemplo de Salida (Adaptado):\n(Consulta ejemplos previos de configuraciones JSON para Chart.js que incluyan ejes con títulos y unidades, adaptados al contexto presupuestario.)\n\nConsideraciones Importantes:\n\nValidación de Datos:\nRealiza una validación inicial de la información presupuestaria y solicita aclaraciones si se detectan inconsistencias o datos incompletos.\n\nManejo de Errores:\nImplementa un manejo adecuado de errores y notifica al usuario si la solicitud no puede ser cumplida debido a problemas en los datos o en el formato.\n\nVersión de Chart.js:\nAsume la versión estable más reciente de Chart.js, salvo que se especifique lo contrario.\n\nBuenas Prácticas:\nSigue las mejores prácticas de Chart.js para lograr visualizaciones efectivas, asegurándote de que los gráficos sean claros y comprensibles.\n\nEtiquetas Claras en los Ejes:\nPrioriza siempre la claridad y precisión en los títulos y unidades de los ejes en todas las configuraciones generadas.\n\nInstrucciones Adicionales:\n\nNo generes callbacks de función dentro de la configuración."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1984,
+        64
+      ],
+      "id": "7cc37d0e-3a7a-4c58-9cfb-6383bcd132f4",
+      "name": "Visualization Agent 📶",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        80
+      ],
+      "id": "2fdb4694-7c48-4018-881b-1ecb3ca9f86c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "agent": "sqlAgent",
+        "promptType": "define",
+        "text": "{{$json.query.query}}\n",
+        "options": {
+          "prefixPrompt": "=Eres un Agente SQL especializado en la tabla \"presupuesto 2025\". Tu objetivo es generar sentencias SQL **limpias y sin código adicional**. Sigue estos lineamientos:\n\n1. **Tabla predeterminada**: Emplea la tabla `\"presupuesto 2025\"` a menos que yo especifique otra.\n2. **Normalización de texto**:\n   - Usa la función `unaccent(LOWER(...))` tanto para filtrar como para agrupar.\n   - Ejemplo de filtrado:\n     SELECT *\n     FROM \"presupuesto 2025\"\n     WHERE unaccent(LOWER(\"unidad organizativa\")) LIKE unaccent('%[criterio de búsqueda]%');\n   - Ejemplo de agrupamiento:\n     SELECT unaccent(LOWER(\"jurisdiccion\")) AS jurisdiccion_normalizada,\n            SUM(\"Presupuestado\") AS total_presupuesto\n     FROM \"presupuesto 2025\"\n     GROUP BY unaccent(LOWER(\"jurisdiccion\"));\n\n3. **Uso de comillas dobles**: Toda columna que contenga espacios o mayúsculas se encierra entre comillas dobles (por ejemplo, \"unidad organizativa\", \"Nombre del Financiamiento\").\n4. **Output**:\n   - Tu respuesta debe consistir **únicamente** en la sentencia SQL final, sin ningún texto adicional, comentarios o explicaciones.\n   - No incluyas JSON ni comentarios; responde solo la consulta SQL.\n5. **Extensión unaccent**: Asume que la extensión unaccent ya está habilitada, por lo que no la crees ni la habilites de nuevo.\n6. **Buenas prácticas SQL**:\n   - Emplea cláusulas de agrupación, filtrado, orden (ORDER BY), etc., según se solicite.\n   - Si la consulta lo requiere, usa ORDER BY especificando la columna o el alias de la columna de agregación.\n\n### Ejemplo de respuesta esperada:\n```sql\nSELECT SUM(\"Presupuestado\") AS total_presupuestado\nFROM \"presupuesto 2025\"\nWHERE unaccent(LOWER(\"jurisdiccion\")) LIKE unaccent('%educacion%');\n\n7. **Sin texto adicional ni análisis:** Responde solamente con la **consulta SQL final** (si se pide la sentencia) o con el **JSON** de resultados (si se pide el resultado). No incluyas tu razonamiento, comentarios o explicaciones en la respuesta.\n8. **Consulta válida:** Toda consulta debe involucrar `\"presupuesto 2025\"` y hacer uso de `unaccent(LOWER(...))` para manejar filtros y agrupaciones textuales.\n\n**Tu objetivo** es generar consultas a la tabla presupuesto  y devolver resultados en formato JSON, acatando los puntos anteriores y sin añadir contenido adicional.\n\n\n\n\n\n"
+        }
+      },
+      "name": "Data Retrieval Agent 👩🏻‍💻1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1888,
+        448
+      ],
+      "retryOnFail": true,
+      "id": "62795295-6363-44fe-b036-76189b730f62",
+      "credentials": {
+        "postgres": {
+          "id": "LqN7HGxps8hHrZvJ",
+          "name": "PRESUPUESTO_2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.query.event }}",
+                    "rightValue": "Generate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generator"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c239ccd7-9acc-421c-9478-812bc330cfd9",
+                    "leftValue": "={{ $json.query.event }}",
+                    "rightValue": "Data",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "data"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7d4cddf8-9af7-49df-a167-380e6d90d21c",
+                    "leftValue": "={{ $json.query.event }}",
+                    "rightValue": "Columns",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Columns"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1712,
+        112
+      ],
+      "id": "26cc7799-08ae-4e01-b926-87ef14e2190c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT column_name FROM information_schema.columns WHERE table_name = 'presupuesto 2025';",
+        "options": {}
+      },
+      "name": "Get Column Names",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        832
+      ],
+      "id": "e3f46ff1-f6b3-4609-beed-402fc4de2a33",
+      "credentials": {
+        "postgres": {
+          "id": "LqN7HGxps8hHrZvJ",
+          "name": "PRESUPUESTO_2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// 1) Recibimos todas las columnas devueltas por \"Get Column Names\".\n// 2) Excluimos la columna de hechos \"Presupuestado\".\n// 3) Construimos una consulta con UNION ALL para obtener los valores únicos.\n\nconst factColumn = 'Presupuestado';\nconst allItems = $input.all();\n\n// Extraemos sólo el campo \"column_name\"\nconst columns = allItems.map(item => item.json.column_name);\n\n// Filtramos la columna de hechos\nconst dimensionColumns = columns.filter(col => col !== factColumn);\n\n// Creamos una sola gran consulta con UNION ALL\n// Cada SELECT trae la columna y un alias column_name\n// Ejemplo: SELECT 'caracter' AS column_name, \"caracter\" AS unique_value FROM \"presupuesto 2025\"\n\nconst queryParts = dimensionColumns.map(col => {\n  return `SELECT '${col}' AS column_name, \"${col}\" AS unique_value\n          FROM \"presupuesto 2025\"`;\n});\n\nconst finalQuery = queryParts.join(' UNION ALL ');\n\nreturn [{ json: { query: finalQuery } }];"
+      },
+      "name": "Build Union Query1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        832
+      ],
+      "id": "fff96efe-886d-4d20-aaaa-21ac52387a20"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.query }}",
+        "options": {}
+      },
+      "name": "Get Distinct Values1",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        832
+      ],
+      "id": "3d78e6bf-b241-4acf-99df-8feb9617096f",
+      "credentials": {
+        "postgres": {
+          "id": "LqN7HGxps8hHrZvJ",
+          "name": "PRESUPUESTO_2025"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Agrupamos por columna. \n// Ej:\n//   {\n//     caracter: [\"Administración Central\", ...],\n//     jurisdiccion: [\"Fiscalía de Estado\", ...],\n//     ...\n//   }\n\nconst groupedData = {};\n\nfor (const item of $input.all()) {\n  const colName = item.json.column_name;\n  const val = item.json.unique_value;\n\n  if (!groupedData[colName]) {\n    groupedData[colName] = [];\n  }\n\n  // Evitar duplicados\n  if (!groupedData[colName].includes(val)) {\n    groupedData[colName].push(val);\n  }\n}\n\nreturn [{ json: groupedData }];"
+      },
+      "name": "Group By Column1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        832
+      ],
+      "id": "2a6e22e7-3b2f-4d52-b03f-aef6bc332ba5"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Queremos devolver un JSON real en la propiedad 'dimensiones', \n// sin convertirlo a string.\n\nif ($input.all().length === 0) {\n  // No hubo datos\n  return [{ json: { dimensiones: {} } }];\n}\n\n// Tomamos el primer item, que es un objeto con todas las columnas.\nconst data = $input.all()[0].json;\n\n// Devolvemos un solo item, con la key \"dimensiones\" conteniendo la info.\nreturn [{ json: { dimensiones: data } }];"
+      },
+      "name": "Format as JSON1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        832
+      ],
+      "id": "78139d70-0e2a-4354-80c8-d3a430eb4f86"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37512e1a-8376-4ba0-bdcd-34bb9329ae4b",
+              "name": "response",
+              "type": "object",
+              "value": "={{ $json.dimensiones }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a26511a-501e-4032-ae9a-5a945aef8b82",
+      "name": "Set response2",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2528,
+        832
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "abbf2946-38a2-45a6-a1c4-649cf8bae9cd",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        592,
+        32
+      ],
+      "id": "4c98fe1b-0aeb-4079-81b8-2a827cfa0f6f",
+      "name": "Webhook",
+      "webhookId": "abbf2946-38a2-45a6-a1c4-649cf8bae9cd"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1104,
+        32
+      ],
+      "id": "95d68f11-2b52-494e-aec1-621e8c4fbeee",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{ $json.sessionId }}",
+        "tableName": "n8n_chat_histories_analista_presu"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        720,
+        272
+      ],
+      "id": "fb896e4c-21f5-4f26-9989-ec75392b6ae0",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "bMUbt9xo910b7yTS",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{ $(\"When chat message received\").item.json.sessionId }}",
+        "tableName": "n8n_chat_histories_chart_analyst"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2064,
+        272
+      ],
+      "id": "137be0f6-cccc-4811-b4ee-c3482c540b1d",
+      "name": "Postgres Chat Memory2",
+      "credentials": {
+        "postgres": {
+          "id": "bMUbt9xo910b7yTS",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "Dimension_extraction",
+        "description": "Call this tool whenever you need to retrieve data. All string values must be properly escaped, especially for multi-line strings.  Don't pass in the SQL query.  Just the question the user asked.",
+        "workflowId": "={{ $workflow.id }}",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n\"type\": \"object\",\n\"properties\": {\n\t\"query\": {\n\t\t\"type\": \"string\",\n\t\t\"description\": \"the users query\"\n\t\t},\n    \"event\": {\n         \"type\": \"string\",\n          \"description\": \"the type of event.  this should always be set to Columns\"\n\t}\n}\n}"
+      },
+      "id": "238143b5-7fb2-4aa5-a871-32a46819bc68",
+      "name": "Dimension_extraction",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        848,
+        272
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "Presupuesto_2025",
+        "toolDescription": "Esta base contine el proyecto de presupuesto aprobado por la provincia de mendoza argentina",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "presupuesto",
+          "mode": "list",
+          "cachedResultName": "presupuesto"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        432
+      ],
+      "id": "f350ba40-3163-4f42-a8a8-f47660fc2bfe",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "T5QI0Qp5EMONsx0h",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        704
+      ],
+      "id": "561f055f-8582-4d09-8c25-7d168f7ba1d3",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "N6jscJ4sJP8v6k45",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "You are a helpful Data Visualization Orchestrator Agent working with three tools:\n\n\n\n1. dimension_extraction\n\nUse this tool if the user wants to see possible columns or values from the \"presupuesto 2025\" table.\n\nThis table’s dimensions are hierarchical:\n\nInstitucional: caracter → jurisdiccion → unidad organizativa\n\nEconómica: CLASI ECONOMICA 1 → CLASIFICACION ECONOMICA_2 → CLASIFICACION ECONOMICA_3 → CLASIFICACION ECONOMICA_4\n\n\nIf the user is unsure which dimension or value to filter on, call this tool to help them discover the correct column and/or values.\n\n\n\n2. retrieve_data\n\nUse this tool if the user needs to fetch or sum data from the \"presupuesto 2025\" table.\n\nProvide the user’s question (not the raw SQL) as the input. The tool will handle generating the final SQL.\n\n\n\n3. generate_a_chart\n\nUse this tool if the user explicitly wants a chart (bar, line, pie, etc.).\n\nProvide a valid Chart.js configuration in JSON format as the input.\n\nThe tool will return a chart URL, which you must display in Markdown format, e.g., ![](URL)\n\n\n\n\nOverall Guidelines\n\nFirst: If the user is unsure about dimension names or possible values, call dimension_extraction to show them.\n\nSecond: Once the user is clear which dimension and filter(s) they want, call retrieve_data to get the numbers.\n\nThird: If they want a visualization, call generate_a_chart.\n\nAlways:\n\nProvide helpful clarifications or ask additional questions if the user’s request is ambiguous.\n\nShow the chart in markdown format (![](url)) if you do generate one.\n\nOnly use the chart tool if the user requests a chart.\n\n\n\nYour goal:\n\n1. Identify whether the user needs dimension info, raw data retrieval, or a chart.\n\n\n2. Call the appropriate tool(s) in the correct order.\n\n\n3. Provide final answers or charts as requested by the user.\n\n\n\nNow, please proceed with the user’s request, applying these steps.\n\n#speak in spanish\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        400,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "7acf5798-a62f-4969-86dc-6267e488c5a8",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-haiku-20241022",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        1952,
+        240
+      ],
+      "id": "c912296a-9727-479c-95cf-b41c1d48141f",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "UGmnyfkKS1vyDWxa",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{ $(\"When chat message received\").item.json.sessionId }}",
+        "tableName": "n8n_chat_histories_sql2"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2032,
+        672
+      ],
+      "id": "5184da30-ceb5-468a-833e-3eae7dc0ac1b",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "bMUbt9xo910b7yTS",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-pro-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        672
+      ],
+      "id": "fd384d4e-8062-485c-8f80-fbdf812cf66f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xC1oNLUEUQJEp6PJ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        512,
+        272
+      ],
+      "id": "58f9f384-41bd-4ff2-83ca-d7b5a89627ca",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xC1oNLUEUQJEp6PJ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Visualization Agent 📶",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate chart": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Data": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visualization Agent 📶": {
+      "main": [
+        [
+          {
+            "node": "Set response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Retrieval Agent 👩🏻‍💻1": {
+      "main": [
+        [
+          {
+            "node": "Set response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Visualization Agent 📶",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Data Retrieval Agent 👩🏻‍💻1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Column Names",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Column Names": {
+      "main": [
+        [
+          {
+            "node": "Build Union Query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Union Query1": {
+      "main": [
+        [
+          {
+            "node": "Get Distinct Values1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Distinct Values1": {
+      "main": [
+        [
+          {
+            "node": "Group By Column1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group By Column1": {
+      "main": [
+        [
+          {
+            "node": "Format as JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format as JSON1": {
+      "main": [
+        [
+          {
+            "node": "Set response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Visualization Agent 📶",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dimension_extraction": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Visualization Agent 📶",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Data Retrieval Agent 👩🏻‍💻1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Data Retrieval Agent 👩🏻‍💻1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orchestrator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "f40d0eb8-b15b-4d3a-805f-2b2c72a671bd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5fb5e70d4f21341263ee64d519f2dfada37b57b1a53a2927e7a11669512c71f5"
+  },
+  "id": "DZ7keDuKMavCTrEz",
+  "tags": [
+    {
+      "updatedAt": "2025-02-18T10:52:34.629Z",
+      "createdAt": "2025-02-18T10:52:34.629Z",
+      "id": "8IwF01cmaN7FAj1p",
+      "name": "AGENTE ANALISTA"
+    }
+  ]
+}

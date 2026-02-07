@@ -1,0 +1,49 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# build
+.next/
+out/
+build/
+dist/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# data (ETL downloads)
+data/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# os
+.DS_Store
+Thumbs.db
+nul
+
+# screenshots / images temporales
+qa-screenshots/
+*.png
+
+# vercel
+.vercel
+
+# claude code local config
+.claude/
+.mcp.json
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
